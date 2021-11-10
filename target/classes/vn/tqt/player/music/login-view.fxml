@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="165.0" prefWidth="477.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.tqt.player.music.controller.LoginController">
+   <children>
+      <TextField fx:id="loginKeyField" layoutX="67.0" layoutY="72.0" prefHeight="32.0" prefWidth="343.0">
+         <font>
+            <Font size="15.0" />
+         </font></TextField>
+      <Label layoutX="131.0" prefHeight="56.0" prefWidth="252.0" text="Welcome To TQTPlayer">
+         <font>
+            <Font size="21.0" />
+         </font>
+      </Label>
+      <Button layoutX="211.0" layoutY="117.0" mnemonicParsing="false" onAction="#login" text="LOGIN " />
+      <Button layoutX="317.0" layoutY="117.0" mnemonicParsing="false" onAction="#sendKeyToEmail" prefHeight="25.0" prefWidth="66.0" text="Send Key" />
+      <Label fx:id="alertText" layoutX="38.0" layoutY="46.0" prefHeight="20.0" prefWidth="420.0" text="                              Please enter the key to login">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>
