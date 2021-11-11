@@ -111,6 +111,7 @@ public class PlayerController implements Initializable {
     private String sourcePathMusic = "music";
 
 
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         importMusicDirectory();
@@ -119,31 +120,40 @@ public class PlayerController implements Initializable {
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
-//
-//        table.setRowFactory( tv -> {
-//            TableRow<Song> row = new TableRow<>();
-//            row.setOnMouseClicked(event -> {
-//                if (event.getClickCount() == 3 && (! row.isEmpty()) ) {
-//                    Song rowData = row.getItem();
-//                    System.out.println(rowData.getSongName());
-//                }
-//            });
-//            return row ;
-//        });
+
+        table.setRowFactory( tv -> {
+            TableRow<Song> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                    Song rowData = row.getItem();
+                    try {
+                        mediaPlayer.stop();
+                        initMedia(rowData.getId()-1);
+                        mediaPlayer.play();
+                        resetVolumeAndSpeed();
+                        beginTimer();
+                        playBtnStatus = true;
+                        playButton.setText("Pause");
+                    } catch (TikaException | IOException | SAXException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            });
+            return row ;
+        });
     }
-        
 
     public void initInfoSong() throws IOException, ParseException {
         importImagesDirectory();
         initSpeedBox();
         initVolumeBar();
         initTableviewSong();
-        getSongTitle();
+        getSongTitle(songNumber);
         importPlaylist();
         showPlaylistOnComBox();
-
         try {
-            setLogoSong();
+            setLogoSong(songNumber);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -176,11 +186,11 @@ public class PlayerController implements Initializable {
             }
         }
     }
-   public void importPlaylist() throws IOException, ParseException {
+    public void importPlaylist() throws IOException, ParseException {
         String dataReader = Json.readFile("data/playlist.json");
         Playlist.listPlaylists = JacksonParser.INSTANCE.toList(dataReader,Playlist.class);
         playlistList.addAll(Playlist.listPlaylists);
-   }
+    }
     public void initSpeedBox() {
         speedBox.getItems().clear();
         for (int i = 0; i < speeds.length; i++) {
@@ -218,20 +228,20 @@ public class PlayerController implements Initializable {
 
     public void showAllSong()  {
         songList.clear();
-        allSong = new ArrayList<>();
+        songs.clear();
         allMusicDirectory = new File(sourcePathMusic);
         allMusicFiles = allMusicDirectory.listFiles();
         if (allMusicFiles != null) {
             for (File file : allMusicFiles) {
-                allSong.add(file.getPath());
+                songs.add(file.getPath());
             }
         }
-        for (int i = 0; i < allSong.size(); i++) {
-            String songName = GetTitleSong.get(i, allSong);
+        for (int i = 0; i < songs.size(); i++) {
+            String songName = GetTitleSong.get(i, songs);
             Song newSong = new Song();
             newSong.setId(i + 1);
             newSong.setSongName(songName);
-            newSong.setSongPath(allSong.get(i));
+            newSong.setSongPath(songs.get(i));
             songList.add(newSong);
         }
     }
@@ -255,7 +265,7 @@ public class PlayerController implements Initializable {
         }
     }
 
-    public String getSongTitle() {
+    public String getSongTitle(int songNumber) {
         File musicFile = new File(songs.get(songNumber));
         return musicFile.getName();
 
@@ -279,24 +289,27 @@ public class PlayerController implements Initializable {
     }
 
     public void initMedia(int songIndex) throws TikaException, IOException, SAXException {
-
         File musicFile = new File(songs.get(songIndex));
         media = new Media(musicFile.toURI().toString());
         mediaPlayer = new MediaPlayer(media);
-        getSongInfo(songNumber);
-        setLogoSong();
+        getSongInfo(songIndex);
+        setLogoSong(songIndex);
     }
 
-    public String getRelativeName() {
-        String songNamePath = getSongTitle();
+    public String getRelativeName(int songNumber) {
+        String songNamePath = getSongTitle(songNumber);
         String relativeSongName = songNamePath.substring(0, songNamePath.length() - 4);
         return relativeSongName + ".jpg";
     }
 
-    public void setLogoSong() throws MalformedURLException {
-        File file = new File("src/main/resources/vn/tqt/player/music/image/" + getRelativeName());
+    public void setLogoSong(int songIndex) throws MalformedURLException {
+        File file = new File("src/main/resources/vn/tqt/player/music/image/" + getRelativeName(songIndex));
         String localUrl = file.toURI().toURL().toString();
         Image image = new Image(localUrl);
+        if(image.isError()){
+            File fileAvailbleImg = new File("src/main/resources/vn/tqt/player/music/image/availableimage.jpg");
+            image = new Image(fileAvailbleImg.toURI().toURL().toString());
+        }
         logoSong.setImage(image);
     }
 
@@ -316,10 +329,10 @@ public class PlayerController implements Initializable {
         }
     }
 
-public void resetVolumeAndSpeed(){
-    volumeBar.setValue(75);
-    speedBox.setValue("100");
-}
+    public void resetVolumeAndSpeed(){
+        volumeBar.setValue(75);
+        speedBox.setValue("100");
+    }
 
     public void nextSong() throws IOException, TikaException, SAXException {
         if (songNumber < songs.size() - 1) {
@@ -368,7 +381,6 @@ public void resetVolumeAndSpeed(){
             }
         }
     }
-
 
     public void loopSong() {
         if (!loopBtnStatus) {
@@ -499,26 +511,25 @@ public void resetVolumeAndSpeed(){
     }
 
     public void playThisList() throws IOException, ParseException {
-            String playlistName = playlistBox.getValue();
-            if (playlistName != null){
-                if (!checkQuantytiSongInPlayList(playlistName)){
-                    Playlist newPlaylist = getPlaylistObjeto(playlistName);
-                    songs.clear();
-                    songs.addAll(newPlaylist.getListSong());
-                    mediaPlayer.pause();
-                    initInfoSong();
-                    playSong();
-                    playlistBox.setValue(playlistName);
-                } else {
-                    String titleAlert = "Player Warring!!";
-                    String contentAlert = "The playlist is empty, please add music to the playlist to play music!";
-                    InitAlertWindow.initAlert(titleAlert,contentAlert);
-                }
-            } else{
-                String titleAlert = "Player Alert!!";
-                String contentAlert = "No playlists, create playlists";
+        String playlistName = playlistBox.getValue();
+        if (playlistName != null){
+            if (!checkQuantytiSongInPlayList(playlistName)){
+                Playlist newPlaylist = getPlaylistObjeto(playlistName);
+                songs.clear();
+                songs.addAll(newPlaylist.getListSong());
+                mediaPlayer.pause();
+                initInfoSong();
+                playlistBox.setValue(playlistName);
+            } else {
+                String titleAlert = "Player Warring!!";
+                String contentAlert = "The playlist is empty, please add music to the playlist to play music!";
                 InitAlertWindow.initAlert(titleAlert,contentAlert);
             }
+        } else{
+            String titleAlert = "Player Alert!!";
+            String contentAlert = "No playlists, create playlists";
+            InitAlertWindow.initAlert(titleAlert,contentAlert);
+        }
     }
 
     public void addToPlayList() throws IOException {
@@ -548,23 +559,23 @@ public void resetVolumeAndSpeed(){
         return false;
     }
 
-   public boolean checkSongInPlaylist(String playlistName, String pathSong){
-       Playlist newPlaylist = getPlaylistObjeto(playlistName);
-            for (int i = 0; i < newPlaylist.getListSong().size(); i++) {
-                if (newPlaylist.getListSong().get(i).equals(pathSong)){
+    public boolean checkSongInPlaylist(String playlistName, String pathSong){
+        Playlist newPlaylist = getPlaylistObjeto(playlistName);
+        for (int i = 0; i < newPlaylist.getListSong().size(); i++) {
+            if (newPlaylist.getListSong().get(i).equals(pathSong)){
                 return true;
-           }
-       }
-       return false;
-   }
+            }
+        }
+        return false;
+    }
 
     public void deletePlaylist() throws IOException {
         String playlistName = playlistBox.getValue();
         Playlist newPlaylist = getPlaylistObjeto(playlistName);
         for (int i = 0; i < Playlist.listPlaylists.size(); i++) {
             if(Playlist.listPlaylists.get(i).equals(newPlaylist)){
-             Playlist.listPlaylists.remove(i);
-             playlistList.remove(i);
+                Playlist.listPlaylists.remove(i);
+                playlistList.remove(i);
             }
         }
         showPlaylistOnComBox();
