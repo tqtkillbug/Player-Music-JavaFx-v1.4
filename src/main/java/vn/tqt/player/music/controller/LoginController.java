@@ -7,8 +7,11 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.json.simple.parser.ParseException;
@@ -29,6 +32,9 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
+
+    @FXML
+    private Button demonode;
     @FXML
     private Label alertText;
     @FXML
@@ -42,7 +48,7 @@ public class LoginController implements Initializable {
         alertText.setTextFill(Color.web("#FF0000"));
         try {
             String dataReader = Json.readFile("data/keymail.json");
-            listKeyAndMail = JacksonParser.INSTANCE.toList(dataReader, KeyData.class) ;
+            listKeyAndMail = JacksonParser.INSTANCE.toList(dataReader, KeyData.class);
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
@@ -124,4 +130,6 @@ public class LoginController implements Initializable {
         return false;
     }
 
+    public void demo(ActionEvent event) {
+    }
 }

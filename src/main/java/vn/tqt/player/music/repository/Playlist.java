@@ -3,6 +3,7 @@ package vn.tqt.player.music.repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Playlist {
     public static List<Playlist> listPlaylists = new ArrayList<Playlist>();
@@ -42,5 +43,13 @@ public class Playlist {
 
     public void setListSong(List<String> listSong) {
         this.listSong = listSong;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Playlist) {
+            return this.getName() == ((Playlist) o).getName();
+        }
+        return false;
     }
 }

@@ -24,5 +24,6 @@
             <Font size="14.0" />
          </font>
       </Label>
+      <Button fx:id="demonode" layoutX="38.0" layoutY="130.0" mnemonicParsing="false" onAction="#demo" text="Vớ vẩn" />
    </children>
 </AnchorPane>
