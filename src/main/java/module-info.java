@@ -26,8 +26,10 @@ module com.example.demo {
     opens vn.tqt.player.music.services to com.fasterxml.jackson.annotation, com.fasterxml.jackson.core, com.fasterxml.jackson.databind, javafx.fxml;
     exports vn.tqt.player.music.controller;
     opens vn.tqt.player.music.controller to com.fasterxml.jackson.annotation, com.fasterxml.jackson.core, com.fasterxml.jackson.databind, javafx.fxml;
-    exports vn.tqt.player.music.services.jsonFile;
-    opens vn.tqt.player.music.services.jsonFile to com.fasterxml.jackson.annotation, com.fasterxml.jackson.core, com.fasterxml.jackson.databind, javafx.fxml;
-    exports vn.tqt.player.music.services.loginservice;
-    opens vn.tqt.player.music.services.loginservice to com.fasterxml.jackson.annotation, com.fasterxml.jackson.core, com.fasterxml.jackson.databind, javafx.fxml;
+    exports vn.tqt.player.music.services.login;
+    opens vn.tqt.player.music.services.login to com.fasterxml.jackson.annotation, com.fasterxml.jackson.core, com.fasterxml.jackson.databind, javafx.fxml;
+    exports vn.tqt.player.music.model;
+    opens vn.tqt.player.music.model to com.fasterxml.jackson.annotation, com.fasterxml.jackson.core, com.fasterxml.jackson.databind, javafx.fxml;
+    exports vn.tqt.player.music.utils;
+    opens vn.tqt.player.music.utils to com.fasterxml.jackson.annotation, com.fasterxml.jackson.core, com.fasterxml.jackson.databind, javafx.fxml;
 }

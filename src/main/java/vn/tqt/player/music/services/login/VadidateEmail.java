@@ -1,4 +1,4 @@
-package vn.tqt.player.music.services.loginservice;
+package vn.tqt.player.music.services.login;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

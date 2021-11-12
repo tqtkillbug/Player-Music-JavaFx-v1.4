@@ -1,4 +1,4 @@
-package vn.tqt.player.music.services.loginservice;
+package vn.tqt.player.music.services.login;
 import org.apache.commons.lang3.RandomStringUtils;
 import java.util.Locale;
 

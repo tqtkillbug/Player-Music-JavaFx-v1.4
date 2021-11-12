@@ -7,11 +7,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
@@ -37,17 +33,17 @@ import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.xml.sax.SAXException;
-import vn.tqt.player.music.PlayerApp;
-import vn.tqt.player.music.repository.Playlist;
-import vn.tqt.player.music.repository.Song;
+import vn.tqt.player.music.model.Playlist;
+import vn.tqt.player.music.model.Song;
 import vn.tqt.player.music.initWindow.InitAlertWindow;
+import vn.tqt.player.music.repository.IPlaylistRepository;
+import vn.tqt.player.music.repository.PlaylistRepository;
 import vn.tqt.player.music.services.GetTitleSong;
-import vn.tqt.player.music.services.jsonFile.JacksonParser;
-import vn.tqt.player.music.services.jsonFile.Json;
+import vn.tqt.player.music.services.IPlaylistService;
+import vn.tqt.player.music.services.PlaylistService;
 
 public class PlayerController implements Initializable {
-    @FXML
-    private  Slider songTimeSlider;
+
     @FXML
     private AnchorPane pane;
     @FXML
@@ -92,7 +88,6 @@ public class PlayerController implements Initializable {
     private File imageDirectory;
     private File[] musicFiles;
     private File[] allMusicFiles;
-    private File[] allMusicFilesInPlayList;
 
     private File[] imageFiles;
     private ArrayList<String> songs;
@@ -111,7 +106,6 @@ public class PlayerController implements Initializable {
     private String sourcePathMusic = "music";
 
 
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         importMusicDirectory();
@@ -121,14 +115,14 @@ public class PlayerController implements Initializable {
             e.printStackTrace();
         }
 
-        table.setRowFactory( tv -> {
+        table.setRowFactory(tv -> {
             TableRow<Song> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
-                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                if (event.getClickCount() == 2 && (!row.isEmpty())) {
                     Song rowData = row.getItem();
                     try {
                         mediaPlayer.stop();
-                        initMedia(rowData.getId()-1);
+                        initMedia(rowData.getId() - 1);
                         mediaPlayer.play();
                         resetVolumeAndSpeed();
                         beginTimer();
@@ -140,7 +134,7 @@ public class PlayerController implements Initializable {
 
                 }
             });
-            return row ;
+            return row;
         });
     }
 
@@ -165,6 +159,7 @@ public class PlayerController implements Initializable {
         }
 
     }
+
     public void importMusicDirectory() {
         songs = new ArrayList<>();
         musicDirectory = new File(sourcePathMusic);
@@ -181,20 +176,21 @@ public class PlayerController implements Initializable {
         imageDirectory = new File("image");
         imageFiles = imageDirectory.listFiles();
         if (imageFiles != null) {
-            for (File file : imageFiles) {
-                images.add(file);
-            }
+            images.addAll(Arrays.asList(imageFiles));
         }
     }
-    public void importPlaylist() throws IOException, ParseException {
-        String dataReader = Json.readFile("data/playlist.json");
-        Playlist.listPlaylists = JacksonParser.INSTANCE.toList(dataReader,Playlist.class);
-        playlistList.addAll(Playlist.listPlaylists);
+
+    IPlaylistService service = new PlaylistService();
+    IPlaylistRepository repository = new PlaylistRepository();
+
+    public void importPlaylist() {
+        playlistList.addAll(service.getPlaylists());
     }
+
     public void initSpeedBox() {
         speedBox.getItems().clear();
-        for (int i = 0; i < speeds.length; i++) {
-            speedBox.getItems().add(Integer.toString(speeds[i]));
+        for (int speed : speeds) {
+            speedBox.getItems().add(Integer.toString(speed));
         }
         speedBox.setOnAction(this::changeSpeed);
     }
@@ -210,23 +206,15 @@ public class PlayerController implements Initializable {
 
     public void initTableviewSong() {
         songList = FXCollections.observableArrayList();
-        idColumn.setCellValueFactory(new PropertyValueFactory<Song, Integer>("id"));
-        nameColumn.setCellValueFactory(new PropertyValueFactory<Song, String>("songName"));
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         table.setItems(songList);
         playlistList = FXCollections.observableArrayList();
         namePlaylist.setPromptText("Enter Name Playlist Want Creat");
     }
 
-    public Playlist getPlaylistObjeto(String name){
-        for (int i = 0; i < Playlist.listPlaylists.size(); i++) {
-            if (Playlist.listPlaylists.get(i).getName().equals(name)){
-                return Playlist.listPlaylists.get(i);
-            }
-        }
-        return null;
-    }
 
-    public void showAllSong()  {
+    public void showAllSong() {
         songList.clear();
         songs.clear();
         allMusicDirectory = new File(sourcePathMusic);
@@ -240,8 +228,8 @@ public class PlayerController implements Initializable {
             String songName = GetTitleSong.get(i, songs);
             Song newSong = new Song();
             newSong.setId(i + 1);
-            newSong.setSongName(songName);
-            newSong.setSongPath(songs.get(i));
+            newSong.setName(songName);
+            newSong.setPath(songs.get(i));
             songList.add(newSong);
         }
     }
@@ -251,8 +239,8 @@ public class PlayerController implements Initializable {
             String songName = GetTitleSong.get(i, songs);
             Song newSong = new Song();
             newSong.setId(i + 1);
-            newSong.setSongName(songName);
-            newSong.setSongPath(songs.get(i));
+            newSong.setName(songName);
+            newSong.setPath(songs.get(i));
             songList.add(newSong);
         }
     }
@@ -260,8 +248,8 @@ public class PlayerController implements Initializable {
     public void showPlaylistOnComBox() {
         playlistBox.getItems().clear();
         playlistBox.setPromptText("Select PlayList");
-        for (int j = 0; j < playlistList.size(); j++) {
-            playlistBox.getItems().add(playlistList.get(j).getName());
+        for (Playlist playlist : playlistList) {
+            playlistBox.getItems().add(playlist.getName());
         }
     }
 
@@ -306,14 +294,14 @@ public class PlayerController implements Initializable {
         File file = new File("src/main/resources/vn/tqt/player/music/image/" + getRelativeName(songIndex));
         String localUrl = file.toURI().toURL().toString();
         Image image = new Image(localUrl);
-        if(image.isError()){
+        if (image.isError()) {
             File fileAvailbleImg = new File("src/main/resources/vn/tqt/player/music/image/availableimage.jpg");
             image = new Image(fileAvailbleImg.toURI().toURL().toString());
         }
         logoSong.setImage(image);
     }
 
-    public void playSong()  {
+    public void playSong() {
         if (playBtnStatus) {
             mediaPlayer.pause();
             cancelTimer();
@@ -329,7 +317,7 @@ public class PlayerController implements Initializable {
         }
     }
 
-    public void resetVolumeAndSpeed(){
+    public void resetVolumeAndSpeed() {
         volumeBar.setValue(75);
         speedBox.setValue("100");
     }
@@ -442,32 +430,29 @@ public class PlayerController implements Initializable {
         task = new TimerTask() {
             public void run() {
                 running = true;
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        double current = mediaPlayer.getCurrentTime().toSeconds();
-                        double end = media.getDuration().toSeconds();
-                        double percenttime = (current /  end) * 100;
-                        int second = (int) current % 60;
-                        int minute = (int) (current / 60) % 60;
-                        String minutes = String.valueOf(minute);
-                        String seconds = String.valueOf(second);
-                        songTime.setText(minutes + ":" + seconds);
-                        songProgressBar.setProgress(current / end);
-                        if (current / end == 1) {
-                            if (randomBtnStatus) {
-                                try {
-                                    playRandomSong();
-                                } catch (TikaException | IOException | SAXException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            cancelTimer();
+                Platform.runLater(() -> {
+                    double current = mediaPlayer.getCurrentTime().toSeconds();
+                    double end = media.getDuration().toSeconds();
+                    double percenttime = (current / end) * 100;
+                    int second = (int) current % 60;
+                    int minute = (int) (current / 60) % 60;
+                    String minutes = String.valueOf(minute);
+                    String seconds = String.valueOf(second);
+                    songTime.setText(minutes + ":" + seconds);
+                    songProgressBar.setProgress(current / end);
+                    if (current / end == 1) {
+                        if (randomBtnStatus) {
                             try {
-                                nextSong();
-                            } catch (IOException | TikaException | SAXException e) {
+                                playRandomSong();
+                            } catch (TikaException | IOException | SAXException e) {
                                 e.printStackTrace();
                             }
+                        }
+                        cancelTimer();
+                        try {
+                            nextSong();
+                        } catch (IOException | TikaException | SAXException e) {
+                            e.printStackTrace();
                         }
                     }
                 });
@@ -490,97 +475,97 @@ public class PlayerController implements Initializable {
         return true;
     }
 
-    public void createPlaylist() throws Exception {
+    public void createPlaylist() {
         String folderPlaylistName = namePlaylist.getText();
         String titleAlert = "Player Information";
         String contentAlert = "Playlist \"" + folderPlaylistName + "\" already exist";
-        if (checkDuplicatePlaylist(folderPlaylistName)){
+        if (checkDuplicatePlaylist(folderPlaylistName)) {
             Playlist newPlaylist = new Playlist();
             newPlaylist.setName(folderPlaylistName);
             playlistList.add(newPlaylist);
-            Playlist.listPlaylists.add(newPlaylist);
-            String jsonPlaylist =  JacksonParser.INSTANCE.toJson(Playlist.listPlaylists);
-            Json.writeFile(jsonPlaylist,"data/playlist.json");
+            repository.update(playlistList);
             namePlaylist.setText("");
             int sizePlaylist = playlistList.size();
             playlistBox.getItems().add(playlistList.get(sizePlaylist - 1).getName());
         } else {
             namePlaylist.setText("");
-            InitAlertWindow.initAlert(titleAlert,contentAlert);
+            InitAlertWindow.initAlert(titleAlert, contentAlert);
         }
     }
 
     public void playThisList() throws IOException, ParseException {
         String playlistName = playlistBox.getValue();
-        if (playlistName != null){
-            if (!checkQuantytiSongInPlayList(playlistName)){
-                Playlist newPlaylist = getPlaylistObjeto(playlistName);
+        if (playlistName != null) {
+            if (!checkQuantytiSongInPlayList(playlistName)) {
+                Playlist newPlaylist = repository.getByName(playlistName);
                 songs.clear();
-                songs.addAll(newPlaylist.getListSong());
+                songs.addAll(newPlaylist.getSongs());
                 mediaPlayer.pause();
                 initInfoSong();
+                playBtnStatus = false;
+                playButton.setText("Play");
                 playlistBox.setValue(playlistName);
             } else {
                 String titleAlert = "Player Warring!!";
                 String contentAlert = "The playlist is empty, please add music to the playlist to play music!";
-                InitAlertWindow.initAlert(titleAlert,contentAlert);
+                InitAlertWindow.initAlert(titleAlert, contentAlert);
             }
-        } else{
+        } else {
             String titleAlert = "Player Alert!!";
             String contentAlert = "No playlists, create playlists";
-            InitAlertWindow.initAlert(titleAlert,contentAlert);
+            InitAlertWindow.initAlert(titleAlert, contentAlert);
         }
     }
-
-    public void addToPlayList() throws IOException {
+    public Playlist getPLayList(String name) {
+        for (Playlist playlist : playlistList) {
+            if (playlist.getName().equals(name))
+                return playlist;
+        }
+        return null;
+    }
+    public void addToPlayList() {
         Song selected = table.getSelectionModel().getSelectedItem();
-        String songPath = selected.getSongPath();
+        String songPath = selected.getPath();
         String playlistName = playlistBox.getValue();
-        if (!checkSongInPlaylist(playlistName,songPath)) {
-            Playlist newPlaylist = getPlaylistObjeto(playlistName);
-            newPlaylist.getListSong().add(songPath);
-            String jsonPlaylist =  JacksonParser.INSTANCE.toJson(Playlist.listPlaylists);
-            Json.writeFile(jsonPlaylist,"data/playlist.json");
+        if (!checkSongInPlaylist(playlistName, songPath)) {
+        Playlist newPlaylist = getPLayList(playlistName);
+            newPlaylist.getSongs().add(songPath);
+            repository.update(playlistList);
             String titleAlert = "ADD Song To Playlist";
-            String contentAlert = "Add Song \"" + selected.getSongName() + "\" to Playlist \"" + playlistName + "\"" + "DONE";
+            String contentAlert = "Add Song \"" + selected.getName() + "\" to Playlist \"" + playlistName + "\"" + "DONE";
             InitAlertWindow.initAlert(titleAlert, contentAlert);
         } else {
             String titleAlert2 = "Player Alerrt!";
-            String contentAlert2 = selected.getSongName() + " already exists in, cannot be added";
+            String contentAlert2 = selected.getName() + " already exists in, cannot be added";
             InitAlertWindow.initAlert(titleAlert2, contentAlert2);
         }
     }
 
     public boolean checkQuantytiSongInPlayList(String playlistName) {
-        Playlist playlist = getPlaylistObjeto(playlistName);
-        if (playlist.getListSong().isEmpty()) {
-            return true;
-        }
-        return false;
+        Playlist playlist = getPLayList(playlistName);
+        return playlist.getSongs().isEmpty();
     }
 
-    public boolean checkSongInPlaylist(String playlistName, String pathSong){
-        Playlist newPlaylist = getPlaylistObjeto(playlistName);
-        for (int i = 0; i < newPlaylist.getListSong().size(); i++) {
-            if (newPlaylist.getListSong().get(i).equals(pathSong)){
+    public boolean checkSongInPlaylist(String playlistName, String pathSong) {
+        Playlist newPlaylist = getPLayList(playlistName);
+        for (int i = 0; i < newPlaylist.getSongs().size(); i++) {
+            if (newPlaylist.getSongs().get(i).equals(pathSong)) {
                 return true;
             }
         }
         return false;
     }
 
-    public void deletePlaylist() throws IOException {
+    public void deletePlaylist() {
         String playlistName = playlistBox.getValue();
-        Playlist newPlaylist = getPlaylistObjeto(playlistName);
-        for (int i = 0; i < Playlist.listPlaylists.size(); i++) {
-            if(Playlist.listPlaylists.get(i).equals(newPlaylist)){
-                Playlist.listPlaylists.remove(i);
+        Playlist newPlaylist = getPLayList(playlistName);
+        for (int i = 0; i < service.getPlaylists().size(); i++) {
+            if (service.getPlaylists().get(i).equals(newPlaylist)) {
                 playlistList.remove(i);
             }
         }
         showPlaylistOnComBox();
-        String jsonPlaylist =  JacksonParser.INSTANCE.toJson(Playlist.listPlaylists);
-        Json.writeFile(jsonPlaylist,"data/playlist.json");
+        repository.update(playlistList);
     }
 
     public void chooseFolder() {
@@ -590,17 +575,8 @@ public class PlayerController implements Initializable {
         sourcePathMusic = selectedDirectory.getPath();
         mediaPlayer.stop();
         initialize(null, null);
+        playBtnStatus = false;
+        playButton.setText("Play");
     }
 
-    public void logOut(ActionEvent event) throws IOException {
-        mediaPlayer.stop();
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        FXMLLoader fxmlLoader = new FXMLLoader();
-        fxmlLoader.setLocation(PlayerApp.class.getResource("login-view.fxml"));
-        Parent parent = fxmlLoader.load();
-        Scene scene = new Scene(parent);
-        stage.setScene(scene);
-        stage.show();
-    }
-    // Ghi đè equal để so sánh hai object
 }

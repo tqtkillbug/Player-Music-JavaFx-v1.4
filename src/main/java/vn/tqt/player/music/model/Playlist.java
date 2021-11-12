@@ -1,25 +1,24 @@
-package vn.tqt.player.music.repository;
+package vn.tqt.player.music.model;
 
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class Playlist {
-    public static List<Playlist> listPlaylists = new ArrayList<Playlist>();
     private String name;
     private String path;
-    private List<String> listSong;
-
-    public Playlist(String name, String path, List<String> listSong) {
-        this.name = name;
-        this.path = path;
-        this.listSong = listSong;
-    }
+    private List<String> songs;
 
     public Playlist() {
-        this.listSong = new ArrayList<>();
+        this.songs = new ArrayList<>();
     }
+
+    public Playlist(String name, String path, List<String> songs) {
+        this.name = name;
+        this.path = path;
+        this.songs = songs;
+    }
+
 
     public String getName() {
         return name;
@@ -37,18 +36,18 @@ public class Playlist {
         this.path = path;
     }
 
-    public List<String> getListSong() {
-        return listSong;
+    public List<String> getSongs() {
+        return songs;
     }
 
-    public void setListSong(List<String> listSong) {
-        this.listSong = listSong;
+    public void setSongs(List<String> songs) {
+        this.songs = songs;
     }
 
     @Override
     public boolean equals(Object o) {
         if (o instanceof Playlist) {
-            return this.getName() == ((Playlist) o).getName();
+            return name.equals(((Playlist) o).name);
         }
         return false;
     }

@@ -9,20 +9,18 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.json.simple.parser.ParseException;
 import vn.tqt.player.music.PlayerApp;
 import vn.tqt.player.music.initWindow.InitAlertWindow;
 import vn.tqt.player.music.repository.KeyData;
-import vn.tqt.player.music.services.jsonFile.JacksonParser;
-import vn.tqt.player.music.services.loginservice.RandomKeyGenerated;
-import vn.tqt.player.music.services.loginservice.SendKeyToMail;
-import vn.tqt.player.music.services.jsonFile.Json;
-import vn.tqt.player.music.services.loginservice.VadidateEmail;
+import vn.tqt.player.music.utils.JacksonParser;
+import vn.tqt.player.music.services.login.RandomKeyGenerated;
+import vn.tqt.player.music.services.login.SendKeyToMail;
+import vn.tqt.player.music.services.login.VadidateEmail;
+import vn.tqt.player.music.utils.TextFileUtil;
 
 import javax.mail.MessagingException;
 import java.io.*;
@@ -46,12 +44,8 @@ public class LoginController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         loginKeyField.setPromptText("Enter Your Key To Login");
         alertText.setTextFill(Color.web("#FF0000"));
-        try {
-            String dataReader = Json.readFile("data/keymail.json");
-            listKeyAndMail = JacksonParser.INSTANCE.toList(dataReader, KeyData.class);
-        } catch (IOException | ParseException e) {
-            e.printStackTrace();
-        }
+        String dataReader = TextFileUtil.read("data/keymail.json");
+        listKeyAndMail = JacksonParser.INSTANCE.toList(dataReader, KeyData.class);
     }
 
     public void login(ActionEvent event) throws IOException {
@@ -89,7 +83,7 @@ public class LoginController implements Initializable {
                 KeyData newKey = new KeyData(key, email);
                 listKeyAndMail.add(newKey);
                 String jsonString = JacksonParser.INSTANCE.toJson(listKeyAndMail);
-                Json.writeFile(jsonString, "data/keymail.json");
+                TextFileUtil.writeFile(jsonString,"data/keymail.json" );
                 String titleAlert = "Login Alert";
                 String contentAlert = "Please check your email and get your key";
                 InitAlertWindow.initAlert(titleAlert, contentAlert);

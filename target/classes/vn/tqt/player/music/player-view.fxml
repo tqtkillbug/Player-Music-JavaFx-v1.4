@@ -40,7 +40,7 @@
             <ImageView fx:id="logoSong" fitHeight="166.0" fitWidth="279.0" pickOnBounds="true" preserveRatio="true" />
          </children>
       </StackPane>
-      <TableView fx:id="table" layoutX="14.0" layoutY="83.0" prefHeight="301.0" prefWidth="215.0">
+      <TableView fx:id="table" layoutX="14.0" layoutY="83.0" prefHeight="301.0" prefWidth="215.0" style="-fx-cursor: hand;">
         <columns>
           <TableColumn fx:id="idColumn" prefWidth="20.0" text="ID" />
           <TableColumn fx:id="nameColumn" prefWidth="194.0" text="Song Name          " />
@@ -54,7 +54,6 @@
       <Button fx:id="showAllSongbtn" layoutX="69.0" layoutY="384.0" mnemonicParsing="false" onAction="#showAllSong" prefHeight="25.0" prefWidth="105.0" text="Show All Song" />
       <Button layoutX="238.0" layoutY="14.0" mnemonicParsing="false" onAction="#deletePlaylist" prefHeight="25.0" prefWidth="38.0" text="X" />
       <Button fx:id="chooseFolderbtn" layoutX="628.0" layoutY="46.0" mnemonicParsing="false" onAction="#chooseFolder" text="Choose Folder" />
-      <Button layoutX="677.0" layoutY="8.0" mnemonicParsing="false" onAction="#logOut" text="LogOut" />
     </children>
    <opaqueInsets>
       <Insets />
