@@ -128,7 +128,7 @@ public class PlayerController implements Initializable {
                         beginTimer();
                         playBtnStatus = true;
                         playButton.setText("Pause");
-                    } catch (TikaException | IOException | SAXException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
 
