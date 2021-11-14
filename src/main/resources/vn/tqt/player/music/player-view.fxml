@@ -14,8 +14,9 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="pane" depthTest="DISABLE" prefHeight="442.0" prefWidth="749.0" style="-fx-background-color: #004953;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.tqt.player.music.controller.PlayerController">
+<AnchorPane fx:id="pane" depthTest="DISABLE" prefHeight="442.0" prefWidth="749.0" style="-fx-background-color: #150050;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vn.tqt.player.music.controller.PlayerController">
     <children>
+      <Button fx:id="newPlaylistbtn" layoutX="12.0" layoutY="11.0" mnemonicParsing="false" onAction="#newPlaylist" text="New PlayList" />
         <Label fx:id="songName" layoutX="318.0" layoutY="273.0" prefHeight="17.0" prefWidth="297.0" text="Songname" textFill="WHITE">
             <font>
                 <Font size="16.0" />
@@ -40,20 +41,20 @@
             <ImageView fx:id="logoSong" fitHeight="166.0" fitWidth="279.0" pickOnBounds="true" preserveRatio="true" />
          </children>
       </StackPane>
-      <TableView fx:id="table" layoutX="14.0" layoutY="83.0" prefHeight="301.0" prefWidth="215.0" style="-fx-cursor: hand;">
+      <TableView fx:id="table" layoutX="14.0" layoutY="83.0" prefHeight="302.0" prefWidth="221.0" style="-fx-cursor: hand;">
         <columns>
-          <TableColumn fx:id="idColumn" prefWidth="20.0" text="ID" />
-          <TableColumn fx:id="nameColumn" prefWidth="194.0" text="Song Name          " />
+          <TableColumn fx:id="idColumn" prefWidth="29.599977493286133" text="ID" />
+          <TableColumn fx:id="nameColumn" prefWidth="191.1999984741211" text="Song Name          " />
         </columns>
       </TableView>
-      <Button fx:id="addToPlayListbtn" layoutX="191.0" layoutY="83.0" mnemonicParsing="false" onAction="#addToPlayList" prefHeight="25.0" prefWidth="38.0" text="Add" />
-      <Button fx:id="createPlaylist" layoutX="191.0" layoutY="14.0" mnemonicParsing="false" onAction="#createPlaylist" prefHeight="25.0" prefWidth="38.0" text="+" />
-      <TextField fx:id="namePlaylist" layoutX="14.0" layoutY="14.0" prefHeight="25.0" prefWidth="168.0" />
+      <Button fx:id="addToPlayListbtn" layoutX="243.0" layoutY="83.0" mnemonicParsing="false" onAction="#addToPlayList" prefHeight="26.0" prefWidth="43.0" text="Add" />
+      <Button fx:id="createPlaylist" layoutX="243.0" layoutY="11.0" mnemonicParsing="false" onAction="#createPlaylist" prefHeight="26.0" prefWidth="43.0" text="+" />
+      <TextField fx:id="namePlaylist" layoutX="16.0" layoutY="11.0" prefHeight="26.0" prefWidth="222.0" />
       <Button fx:id="playThisListBtn" layoutX="191.0" layoutY="46.0" mnemonicParsing="false" onAction="#playThisList" text="Play" />
-      <ComboBox fx:id="playlistBox" layoutX="14.0" layoutY="46.0" prefHeight="25.0" prefWidth="168.0" promptText="Select Play List" />
       <Button fx:id="showAllSongbtn" layoutX="69.0" layoutY="384.0" mnemonicParsing="false" onAction="#showAllSong" prefHeight="25.0" prefWidth="105.0" text="Show All Song" />
-      <Button layoutX="238.0" layoutY="14.0" mnemonicParsing="false" onAction="#deletePlaylist" prefHeight="25.0" prefWidth="38.0" text="X" />
+      <Button layoutX="243.0" layoutY="45.0" mnemonicParsing="false" onAction="#deletePlaylist" prefHeight="26.0" prefWidth="43.0" text="X" />
       <Button fx:id="chooseFolderbtn" layoutX="628.0" layoutY="46.0" mnemonicParsing="false" onAction="#chooseFolder" text="Choose Folder" />
+      <ComboBox fx:id="playlistBox" layoutX="14.0" layoutY="46.0" prefHeight="25.0" prefWidth="168.0" promptText="Select Play List" />
     </children>
    <opaqueInsets>
       <Insets />

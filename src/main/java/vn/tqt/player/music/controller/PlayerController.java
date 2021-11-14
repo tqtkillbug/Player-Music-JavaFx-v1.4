@@ -57,7 +57,7 @@ public class PlayerController implements Initializable {
     @FXML
     private Label songTime;
     @FXML
-    private Button playButton, pauseButton, nextButton, perviousButton, loopButton, randomButton;
+    private Button playButton, pauseButton, nextButton, perviousButton, loopButton, randomButton, createPlaylist, newPlaylistbtn;
     @FXML
     private ComboBox<String> speedBox;
     @FXML
@@ -136,6 +136,10 @@ public class PlayerController implements Initializable {
             });
             return row;
         });
+        createPlaylist.setOpacity(0);
+        createPlaylist.setDisable(true);
+        namePlaylist.setDisable(true);
+        namePlaylist.setOpacity(0);
     }
 
     public void initInfoSong() throws IOException, ParseException {
@@ -166,11 +170,12 @@ public class PlayerController implements Initializable {
         musicFiles = musicDirectory.listFiles();
         if (musicFiles != null) {
             for (File file : musicFiles) {
-                songs.add(file.getPath());
+                if (file.getPath().startsWith(".mp3", file.getPath().length()-4)){
+                    songs.add(file.getPath());
+                }
             }
         }
     }
-
     public void importImagesDirectory() {
         images = new ArrayList<>();
         imageDirectory = new File("image");
@@ -468,6 +473,7 @@ public class PlayerController implements Initializable {
 
     public boolean checkDuplicatePlaylist(String folderPlaylistName) {
         for (Playlist playlist : playlistList) {
+            System.out.println(playlist.getName());
             if (playlist.getName().trim().equals(folderPlaylistName.trim())) {
                 return false;
             }
@@ -476,6 +482,12 @@ public class PlayerController implements Initializable {
     }
 
     public void createPlaylist() {
+        createPlaylist.setOpacity(0);
+        createPlaylist.setDisable(true);
+        namePlaylist.setDisable(true);
+        namePlaylist.setOpacity(0);
+        newPlaylistbtn.setDisable(false);
+        newPlaylistbtn.setOpacity(1);
         String folderPlaylistName = namePlaylist.getText();
         String titleAlert = "Player Information";
         String contentAlert = "Playlist \"" + folderPlaylistName + "\" already exist";
@@ -487,6 +499,8 @@ public class PlayerController implements Initializable {
             namePlaylist.setText("");
             int sizePlaylist = playlistList.size();
             playlistBox.getItems().add(playlistList.get(sizePlaylist - 1).getName());
+            newPlaylistbtn.setDisable(false);
+            newPlaylistbtn.setOpacity(1);
         } else {
             namePlaylist.setText("");
             InitAlertWindow.initAlert(titleAlert, contentAlert);
@@ -496,7 +510,7 @@ public class PlayerController implements Initializable {
     public void playThisList() throws IOException, ParseException {
         String playlistName = playlistBox.getValue();
         if (playlistName != null) {
-            if (!checkQuantytiSongInPlayList(playlistName)) {
+            if (!checkQuantitySongInPlayList(playlistName)) {
                 Playlist newPlaylist = repository.getByName(playlistName);
                 songs.clear();
                 songs.addAll(newPlaylist.getSongs());
@@ -541,7 +555,7 @@ public class PlayerController implements Initializable {
         }
     }
 
-    public boolean checkQuantytiSongInPlayList(String playlistName) {
+    public boolean checkQuantitySongInPlayList(String playlistName) {
         Playlist playlist = getPLayList(playlistName);
         return playlist.getSongs().isEmpty();
     }
@@ -579,4 +593,12 @@ public class PlayerController implements Initializable {
         playButton.setText("Play");
     }
 
+    public void newPlaylist(ActionEvent actionEvent) {
+        createPlaylist.setOpacity(1);
+        createPlaylist.setDisable(false);
+        namePlaylist.setDisable(false);
+        namePlaylist.setOpacity(1);
+        newPlaylistbtn.setDisable(true);
+        newPlaylistbtn.setOpacity(0);
+    }
 }

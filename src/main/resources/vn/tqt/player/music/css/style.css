@@ -9,4 +9,8 @@
 .button:hover {
     -fx-background-color: linear-gradient(#E26A2C, #FF8243);
 }
+.ComboBox{
+    -fx-background-color: rgb(255, 81, 81);
+    -fx-text-fill: white;
+}
 

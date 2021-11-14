@@ -56,6 +56,7 @@ public class LoginController implements Initializable {
             fxmlLoader.setLocation(PlayerApp.class.getResource("player-view.fxml"));
             Parent parent = fxmlLoader.load();
             Scene scene = new Scene(parent);
+            scene.getStylesheets().add(PlayerApp.class.getResource("css/style.css").toExternalForm());
             stage.setScene(scene);
             stage.show();
         } else {
